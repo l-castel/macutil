@@ -6,6 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 cargo build --release
+VERSION=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
 APP=dist/Macutil.app
 HELPER=$APP/Contents/Helpers/MacutilLocation.app
 rm -rf dist && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$HELPER/Contents/MacOS"
@@ -25,7 +26,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleExecutable</key><string>macutil-launcher</string>
   <key>CFBundleIconFile</key><string>Macutil</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>0.1.0</string>
+  <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>LSUIElement</key><true/>
   <key>NSBluetoothAlwaysUsageDescription</key><string>Macutil manages your Bluetooth devices.</string>
 </dict></plist>
