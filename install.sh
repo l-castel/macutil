@@ -1,12 +1,12 @@
 #!/bin/bash
-# Installs macutil: builds Macutil.app into ~/Applications and links the TUIs into ~/.local/bin.
+# Installs macutil: builds Macutil.app into /Applications and links the TUIs into ~/.local/bin.
 #   ./install.sh             install or update
 #   ./install.sh --uninstall remove what install created
 # Override locations with APPS_DIR and BIN_DIR (MATUGEN_CONFIG picks the matugen config).
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APPS_DIR="${APPS_DIR:-$HOME/Applications}"
+APPS_DIR="${APPS_DIR:-/Applications}"
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
 APP="$APPS_DIR/Macutil.app"
 BINS=(macutil macutil-wifi macutil-bt macutil-ts)

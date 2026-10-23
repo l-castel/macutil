@@ -52,7 +52,7 @@ The formula and the cask install the same commands, so install one or the other,
 ### Install script
 
 Builds from a checkout, installs `Macutil.app` (with the Location helper) into
-`~/Applications` and links the commands into `~/.local/bin`.
+`/Applications` and links the commands into `~/.local/bin`.
 
 ```sh
 git clone https://github.com/l-castel/macutil.git
@@ -77,7 +77,7 @@ The binaries land in `target/release/` (`macutil`, `macutil-wifi`, `macutil-bt`,
 `macutil-ts`). Keep them in the same directory: the menu launches its siblings.
 This gives you the tools **without** the Location helper, so WiFi network names are
 blank. To get the helper, run `scripts/bundle.sh` instead. It builds `dist/Macutil.app`,
-which you can copy to `~/Applications`.
+which you can copy to `/Applications`.
 
 ## Usage
 

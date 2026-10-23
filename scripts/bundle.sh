@@ -8,7 +8,8 @@ cd "$(dirname "$0")/.."
 cargo build --release
 APP=dist/Macutil.app
 HELPER=$APP/Contents/Helpers/MacutilLocation.app
-rm -rf dist && mkdir -p "$APP/Contents/MacOS" "$HELPER/Contents/MacOS"
+rm -rf dist && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$HELPER/Contents/MacOS"
+cp packaging/Macutil.icns "$APP/Contents/Resources/Macutil.icns"
 
 for b in macutil macutil-wifi macutil-bt macutil-ts; do
   cp "target/release/$b" "$APP/Contents/MacOS/$b"
@@ -22,6 +23,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIdentifier</key><string>dev.macutil.app</string>
   <key>CFBundleName</key><string>Macutil</string>
   <key>CFBundleExecutable</key><string>macutil-launcher</string>
+  <key>CFBundleIconFile</key><string>Macutil</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>0.1.0</string>
   <key>LSUIElement</key><true/>
@@ -64,4 +66,4 @@ codesign --force --sign - "$HELPER"
 for b in macutil macutil-launcher macutil-wifi macutil-bt macutil-ts; do codesign --force --sign - "$APP/Contents/MacOS/$b"; done
 codesign --force --sign - "$APP"
 echo "built $APP"
-echo "install: cp -R $APP ~/Applications/   (then run ~/Applications/Macutil.app/Contents/MacOS/macutil-wifi, press s, and answer the Location prompt)"
+echo "install: cp -R $APP /Applications/   (then run /Applications/Macutil.app/Contents/MacOS/macutil-wifi, press s, and answer the Location prompt)"
