@@ -1,0 +1,19 @@
+[package]
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+name = "macutil-wifi"
+
+[dependencies]
+macutil-tui-kit.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+anyhow.workspace = true
+objc2.workspace = true
+objc2-foundation.workspace = true
+objc2-core-wlan.workspace = true
+objc2-core-location = "0.3.2"
+objc2-app-kit = "0.3.2"
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true

@@ -1,0 +1,15 @@
+[package]
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+name = "macutil-bt"
+
+[dependencies]
+macutil-tui-kit.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+anyhow.workspace = true
+objc2.workspace = true
+objc2-foundation.workspace = true
+objc2-io-bluetooth.workspace = true

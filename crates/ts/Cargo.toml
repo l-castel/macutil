@@ -1,0 +1,14 @@
+[package]
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+name = "macutil-ts"
+
+[dependencies]
+macutil-tui-kit.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true

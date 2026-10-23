@@ -1,0 +1,12 @@
+[package]
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+name = "macutil"
+
+[dependencies]
+macutil-tui-kit.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+anyhow.workspace = true

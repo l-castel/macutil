@@ -1,0 +1,13 @@
+# matugen template for macutil. Output goes to ~/.config/macutil/theme.toml.
+# No `bg` by default: macutil keeps your terminal's own background, which your terminal
+# theme already follows. Uncomment to paint a background instead.
+# bg = "{{colors.surface.default.hex}}"
+fg = "{{colors.on_surface.default.hex}}"
+dim = "{{colors.outline.default.hex}}"
+accent = "{{colors.primary.default.hex}}"
+on_accent = "{{colors.on_primary.default.hex}}"
+# good/warn are omitted so status dots stay green/amber; muted wallpapers make
+# tertiary/secondary look grey. Uncomment to follow the palette instead.
+# good = "{{colors.tertiary.default.hex}}"
+# warn = "{{colors.secondary.default.hex}}"
+bad = "{{colors.error.default.hex}}"
