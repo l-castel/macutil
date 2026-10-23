@@ -1,4 +1,0 @@
-# Add to ~/.config/matugen/config.toml (adjust input_path to where you keep the template)
-[templates.macutil]
-input_path = '~/dev/macutil/contrib/matugen/macutil-theme.toml'
-output_path = '~/.config/macutil/theme.toml'

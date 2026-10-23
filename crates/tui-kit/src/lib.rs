@@ -1,6 +1,7 @@
 //! Shared terminal UI kit for the macutil apps: theme, event loop, common widgets.
 
 pub mod input;
+pub mod matugen;
 pub mod theme;
 pub mod widgets;
 
@@ -25,6 +26,8 @@ pub trait App {
 
 /// Runs `app` until it asks to quit, restoring the terminal on exit or panic.
 pub fn run(app: &mut impl App, tick: Duration) -> Result<()> {
+    static FIRST_RUN: std::sync::Once = std::sync::Once::new();
+    FIRST_RUN.call_once(matugen::first_run);
     let mut term = ratatui::init();
     let res = (|| -> Result<()> {
         let mut last = Instant::now();

@@ -15,31 +15,44 @@ Requires macOS 14 (Sonoma) or newer. Apple silicon is the tested platform.
 
 ## Install
 
+Every option below installs the same tools. They differ in one thing: whether they include
+the **Location helper**, a small app that lets `macutil-wifi` show network names (macOS hides
+them otherwise; see [Permissions](#permissions)).
+
+| Method | Location helper | WiFi network names |
+|---|---|---|
+| Homebrew cask | included | shown |
+| Install script | included | shown |
+| Build the app bundle (`scripts/bundle.sh`) | included | shown |
+| Homebrew formula | **not included** | **blank** |
+| Plain `cargo build` | **not included** | **blank** |
+
+If you use WiFi, pick one of the first three.
+
 ### Homebrew cask (recommended)
 
-Installs `Macutil.app` and puts the four commands on your `PATH`. This is the
-full-featured install, including the Location helper that lets macOS reveal WiFi
-network names (see [Permissions](#permissions)).
+Installs `Macutil.app` and puts the four commands on your `PATH`. The cask comes from a
+personal tap, so it needs no Apple notarization.
 
 ```sh
 brew install --cask l-castel/tap/macutil
 ```
 
-### Homebrew formula
+### Homebrew formula (no Location helper)
 
-Builds the command-line tools from source with Homebrew's Rust toolchain. It does not
-include the Location helper, so WiFi network names will be blank.
+Builds only the command-line tools from source with Homebrew's Rust toolchain. WiFi
+network names will be blank. Use the cask if you need them.
 
 ```sh
 brew install l-castel/tap/macutil
 ```
 
-The formula and the cask conflict; install one or the other.
+The formula and the cask install the same commands, so install one or the other, not both.
 
 ### Install script
 
-Builds from a checkout, installs `Macutil.app` into `~/Applications` and links the
-commands into `~/.local/bin`.
+Builds from a checkout, installs `Macutil.app` (with the Location helper) into
+`~/Applications` and links the commands into `~/.local/bin`.
 
 ```sh
 git clone https://github.com/l-castel/macutil.git
@@ -62,8 +75,9 @@ cargo build --release
 
 The binaries land in `target/release/` (`macutil`, `macutil-wifi`, `macutil-bt`,
 `macutil-ts`). Keep them in the same directory: the menu launches its siblings.
-To build the app bundle with the Location helper instead, run `scripts/bundle.sh`,
-which produces `dist/Macutil.app`.
+This gives you the tools **without** the Location helper, so WiFi network names are
+blank. To get the helper, run `scripts/bundle.sh` instead. It builds `dist/Macutil.app`,
+which you can copy to `~/Applications`.
 
 ## Usage
 
@@ -90,38 +104,60 @@ Homebrew.
 - **Location**: macOS hides WiFi network names from any process without Location access,
   and command-line tools cannot be granted it. The app bundle includes a small helper
   (`MacutilLocation.app`) that holds this permission. Run `macutil-wifi`, press `s`, and
-  answer the prompt once. Without the helper, scans work but names are blank.
+  answer the prompt once. Without the helper (formula or plain `cargo build`), scans still
+  work but network names are blank.
 
 ## Theming
 
-Colours are read from `~/.config/macutil/theme.toml` (or the path in `$MACUTIL_THEME`)
-and reloaded live when the file changes. All keys are optional `#rrggbb` values:
+macutil works on its own: with no theme file it uses a built-in Tokyo Night palette.
+To change it, edit `~/.config/macutil/theme.toml` (or the path in `$MACUTIL_THEME`).
+Changes apply live. All keys are optional `#rrggbb` values:
 
 ```toml
-fg = "#e4e2e3"
-dim = "#919092"
-accent = "#bfc7d5"
-on_accent = "#29313c"
+fg = "#c0caf5"
+dim = "#565f89"
+accent = "#7aa2f7"
+on_accent = "#000000"
 good = "#9ece6a"
 warn = "#e0af68"
 bad = "#f7768e"
-# bg = "#131314"   # unset keeps your terminal's background
+# bg = "#1a1b26"   # unset keeps your terminal's background
 ```
 
-### matugen
+### matugen (optional)
 
-`./install.sh` copies a [matugen](https://github.com/InioX/matugen) template to
-`~/.config/macutil/` and registers it in `~/.config/matugen/config.toml` if that file
-exists. Re-run matugen on your wallpaper and any open macutil window recolours. To set
-it up by hand, add this to your matugen config:
+If [matugen](https://github.com/InioX/matugen) is installed, macutil can follow your
+matugen theme. It asks first, once:
 
-```toml
-[templates.macutil]
-input_path = '~/.config/macutil/matugen-template.toml'
-output_path = '~/.config/macutil/theme.toml'
+```
+Allow macutil to add its template to <matugen config> so its colours follow your matugen theme? [y/N]
 ```
 
-The template lives at `contrib/matugen/macutil-theme.toml`.
+You'll see this during `./install.sh`, or on the first launch of any macutil tool if you
+installed with Homebrew (Homebrew installs can't prompt or write to your home directory).
+Your answer is saved in `~/.config/macutil/matugen-consent`. To change it, delete that
+file, or run `macutil setup-matugen` (add `--yes` or `--no` to skip the question).
+
+If you answer yes, macutil:
+
+1. writes its template to `~/.config/macutil/matugen-template.toml`. An existing file is
+   kept, so you can edit it to pick other Material You roles.
+2. appends this block to your matugen config, unless it's already there:
+   ```toml
+   [templates.macutil]
+   input_path = '~/.config/macutil/matugen-template.toml'
+   output_path = '~/.config/macutil/theme.toml'
+   ```
+3. renders the theme once from your current wallpaper, so it matches straight away.
+   Only macutil's template is rendered, so other apps and matugen hooks aren't run.
+
+From then on, every matugen run rewrites `theme.toml`, and macutil picks it up.
+
+No macOS permission is involved. The matugen config is a regular file in your home
+directory. The config used is `$MATUGEN_CONFIG` if set. Otherwise it's matugen's macOS
+default, `~/Library/Application Support/com.InioX.matugen/config.toml`, or
+`~/.config/matugen/config.toml` if only that one exists (for setups that call
+`matugen -c`). To undo, remove the `[templates.macutil]` block.
 
 ## Uninstall
 

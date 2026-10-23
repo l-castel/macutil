@@ -1,6 +1,6 @@
 //! Theme loaded from `$MACUTIL_THEME`, `$XDG_CONFIG_HOME/macutil/theme.toml` or
-//! `~/.config/macutil/theme.toml` (the file matugen renders), falling back to built-in
-//! defaults. The file is re-read when its mtime changes, so wallpaper changes apply live.
+//! `~/.config/macutil/theme.toml` (hand-edited, or rendered by matugen; see `matugen.rs`),
+//! falling back to built-in Tokyo Night defaults. The file is re-read when its mtime changes, so wallpaper changes apply live.
 
 use std::path::PathBuf;
 use std::sync::RwLock;

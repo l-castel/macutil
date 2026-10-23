@@ -58,6 +58,16 @@ impl App for Menu {
 }
 
 fn main() -> Result<()> {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.first().map(String::as_str) == Some("setup-matugen") {
+        let answer = match args.get(1).map(String::as_str) {
+            Some("--yes") => Some(true),
+            Some("--no") => Some(false),
+            _ => None,
+        };
+        macutil_tui_kit::matugen::setup(answer);
+        return Ok(());
+    }
     let dir = std::env::current_exe()?.parent().map(|p| p.to_path_buf()).unwrap_or_default();
     let mut menu = Menu { list: ListState::default().with_selected(Some(0)), chosen: None, error: None };
     loop {
