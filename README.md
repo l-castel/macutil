@@ -111,15 +111,15 @@ whichever it finds first (set `MACUTIL_TERMINAL=/Applications/Name.app` to choos
 panel has no titlebar or window buttons. `q` quits and closes it. Terminal.app, the last
 fallback, opens a normal window.
 
-The window is titled `macutil`. With a tiling window manager, add a rule to float it. For
-AeroSpace, put this above any rule that matches your terminal, because AeroSpace stops at
-the first match:
+The window is titled `macutil`. Tiling window managers may float it because it has no
+window buttons. To tile it in AeroSpace, add this rule above any rule that matches your
+terminal, because AeroSpace stops at the first match:
 
 ```toml
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
 if.window-title-regex-substring = '^macutil$'
-run = 'layout floating'
+run = 'layout tiling'
 ```
 
 ## Permissions
