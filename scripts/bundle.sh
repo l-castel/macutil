@@ -57,10 +57,7 @@ COLS=96 ROWS=24
 for t in "${MACUTIL_TERMINAL:-}" /Applications/Ghostty.app /Applications/kitty.app /Applications/Alacritty.app /Applications/WezTerm.app; do
   [ -n "$t" ] && [ -d "$t" ] || continue
   case "$t" in
-    *Ghostty*) # Centre it: Ghostty otherwise reopens wherever its last window closed.
-               POS=$("$(dirname "$BIN")/macutil" panel-position "$t/Contents/MacOS/ghostty" $COLS $ROWS 2>/dev/null)
-               set --; [ -n "$POS" ] && set -- --window-position-x="${POS% *}" --window-position-y="${POS#* }"
-               exec open -na "$t" --args "$@" --title=macutil --macos-titlebar-style=hidden --macos-window-buttons=hidden \
+    *Ghostty*) exec open -na "$t" --args --title=macutil --macos-titlebar-style=hidden --macos-window-buttons=hidden \
                  --window-width=$COLS --window-height=$ROWS --window-save-state=never --resize-overlay=never \
                  --quit-after-last-window-closed=true --confirm-close-surface=false --initial-command="$BIN" ;;
     *WezTerm*) exec open -na "$t" --args --config window_decorations=\"RESIZE\" --config initial_cols=$COLS \

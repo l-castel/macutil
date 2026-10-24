@@ -108,8 +108,7 @@ DisplayPort outputs) show "fixed volume".
 
 `Macutil.app` opens the menu in a small panel in Ghostty, kitty, Alacritty or WezTerm,
 whichever it finds first (set `MACUTIL_TERMINAL=/Applications/Name.app` to choose). The
-panel has no titlebar or window buttons. `q` quits and closes it. In Ghostty it opens centred
-on the main screen; other terminals place it themselves. Terminal.app, the last
+panel has no titlebar or window buttons. `q` quits and closes it. Terminal.app, the last
 fallback, opens a normal window.
 
 The window is titled `macutil`. With a tiling window manager, add a rule to float it. For

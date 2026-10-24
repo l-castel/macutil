@@ -1,5 +1,3 @@
-mod panel;
-
 use std::process::Command;
 use std::time::Duration;
 
@@ -69,16 +67,6 @@ fn main() -> Result<()> {
             _ => None,
         };
         macutil_tui_kit::matugen::setup(answer);
-        return Ok(());
-    }
-    // Used by Macutil.app's launcher: `panel-position <ghostty binary> <cols> <rows>`.
-    if args.first().map(String::as_str) == Some("panel-position") {
-        let num = |i: usize| args.get(i).and_then(|v| v.parse::<f64>().ok());
-        if let (Some(bin), Some(cols), Some(rows)) = (args.get(1), num(2), num(3)) {
-            if let Some((x, y)) = panel::position(bin, cols, rows) {
-                println!("{x} {y}");
-            }
-        }
         return Ok(());
     }
     let dir = std::env::current_exe()?.parent().map(|p| p.to_path_buf()).unwrap_or_default();

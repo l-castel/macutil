@@ -652,8 +652,6 @@ dependencies = [
  "anyhow",
  "crossterm",
  "macutil-tui-kit",
- "objc2",
- "objc2-app-kit",
  "ratatui",
 ]
 
