@@ -12,7 +12,7 @@ HELPER=$APP/Contents/Helpers/MacutilLocation.app
 rm -rf dist && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$HELPER/Contents/MacOS"
 cp packaging/Macutil.icns "$APP/Contents/Resources/Macutil.icns"
 
-for b in macutil macutil-wifi macutil-bt macutil-ts; do
+for b in macutil macutil-wifi macutil-bt macutil-ts macutil-audio; do
   cp "target/release/$b" "$APP/Contents/MacOS/$b"
 done
 cp target/release/macutil-wifi "$HELPER/Contents/MacOS/macutil-wifi"
@@ -46,16 +46,29 @@ cat > "$HELPER/Contents/Info.plist" <<PLIST
 </dict></plist>
 PLIST
 
-# Opens the menu in the first terminal found (override with MACUTIL_TERMINAL=/path/to/App.app).
+# Opens the menu in the first terminal found (override with MACUTIL_TERMINAL=/path/to/App.app)
+# as a small panel: no titlebar or window buttons, fixed size, titled "macutil" so tiling
+# window managers can float it (see the README). q quits and closes the window.
+# Ghostty gets --initial-command, not -e: -e from another app shows an "Allow Ghostty to execute" prompt.
 cat > "$APP/Contents/MacOS/macutil-launcher" <<'LAUNCH'
 #!/bin/bash
 BIN="$(cd "$(dirname "$0")" && pwd)/macutil"
+COLS=96 ROWS=24
 for t in "${MACUTIL_TERMINAL:-}" /Applications/Ghostty.app /Applications/kitty.app /Applications/Alacritty.app /Applications/WezTerm.app; do
   [ -n "$t" ] && [ -d "$t" ] || continue
   case "$t" in
-    *WezTerm*) exec open -na "$t" --args start -- "$BIN" ;;
-    *kitty*)   exec open -na "$t" --args "$BIN" ;;
-    *)         exec open -na "$t" --args -e "$BIN" ;;
+    *Ghostty*) # Centre it: Ghostty otherwise reopens wherever its last window closed.
+               POS=$("$(dirname "$BIN")/macutil" panel-position "$t/Contents/MacOS/ghostty" $COLS $ROWS 2>/dev/null)
+               set --; [ -n "$POS" ] && set -- --window-position-x="${POS% *}" --window-position-y="${POS#* }"
+               exec open -na "$t" --args "$@" --title=macutil --macos-titlebar-style=hidden --macos-window-buttons=hidden \
+                 --window-width=$COLS --window-height=$ROWS --window-save-state=never --resize-overlay=never \
+                 --quit-after-last-window-closed=true --confirm-close-surface=false --initial-command="$BIN" ;;
+    *WezTerm*) exec open -na "$t" --args --config window_decorations=\"RESIZE\" --config initial_cols=$COLS \
+                 --config initial_rows=$ROWS start --class macutil -- "$BIN" ;;
+    *kitty*)   exec open -na "$t" --args --title macutil -o hide_window_decorations=titlebar-only -o remember_window_size=no \
+                 -o initial_window_width=${COLS}c -o initial_window_height=${ROWS}c "$BIN" ;;
+    *)         exec open -na "$t" --args --title macutil -o 'window.decorations="Buttonless"' \
+                 -o window.dimensions.columns=$COLS -o window.dimensions.lines=$ROWS -e "$BIN" ;;
   esac
 done
 exec osascript -e "tell application \"Terminal\" to do script \"exec '$BIN'\"" -e 'tell application "Terminal" to activate'
@@ -64,7 +77,7 @@ chmod +x "$APP/Contents/MacOS/macutil-launcher"
 
 # Ad-hoc signing gives each bundle a stable identity for the privacy database.
 codesign --force --sign - "$HELPER"
-for b in macutil macutil-launcher macutil-wifi macutil-bt macutil-ts; do codesign --force --sign - "$APP/Contents/MacOS/$b"; done
+for b in macutil macutil-launcher macutil-wifi macutil-bt macutil-ts macutil-audio; do codesign --force --sign - "$APP/Contents/MacOS/$b"; done
 codesign --force --sign - "$APP"
 echo "built $APP"
 echo "install: cp -R $APP /Applications/   (then run /Applications/Macutil.app/Contents/MacOS/macutil-wifi, press s, and answer the Location prompt)"

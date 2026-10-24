@@ -1,8 +1,8 @@
 # macutil
 
-Keyboard-driven terminal utilities for macOS: manage **WiFi**, **Bluetooth** and
-**Tailscale** from the terminal, using native system frameworks (CoreWLAN and
-IOBluetooth) rather than wrapping flaky command-line tools.
+Keyboard-driven terminal utilities for macOS: manage **WiFi**, **Bluetooth**,
+**Tailscale** and **audio devices** from the terminal, using native system frameworks
+(CoreWLAN, IOBluetooth and CoreAudio) rather than wrapping flaky command-line tools.
 
 | Command | What it does |
 |---|---|
@@ -10,6 +10,7 @@ IOBluetooth) rather than wrapping flaky command-line tools.
 | `macutil-wifi` | Scan, connect (including hidden networks), disconnect, power |
 | `macutil-bt` | Paired and nearby devices, connect, disconnect, pair, forget |
 | `macutil-ts` | Peers, exit nodes (listed by city), ping, up/down, copy IP |
+| `macutil-audio` | Output and input devices: default device, volume, mute, sample rate |
 
 Requires macOS 14 (Sonoma) or newer. Apple silicon is the tested platform.
 
@@ -31,7 +32,7 @@ If you use WiFi, pick one of the first three.
 
 ### Homebrew cask (recommended)
 
-Installs `Macutil.app` and puts the four commands on your `PATH`. The cask comes from a
+Installs `Macutil.app` and puts the five commands on your `PATH`. The cask comes from a
 personal tap, so it needs no Apple notarization.
 
 ```sh
@@ -74,7 +75,7 @@ cargo build --release
 ```
 
 The binaries land in `target/release/` (`macutil`, `macutil-wifi`, `macutil-bt`,
-`macutil-ts`). Keep them in the same directory: the menu launches its siblings.
+`macutil-ts`, `macutil-audio`). Keep them in the same directory: the menu launches its siblings.
 This gives you the tools **without** the Location helper, so WiFi network names are
 blank. To get the helper, run `scripts/bundle.sh` instead. It builds `dist/Macutil.app`,
 which you can copy to `/Applications`.
@@ -97,6 +98,30 @@ The filter matches city, country name, two-letter country code and hostname.
 
 macutil-ts needs the `tailscale` command line tool, either from the Tailscale app or
 Homebrew.
+
+**macutil-audio**: `⏎` make default · `←`/`→` or `h`/`l` volume (hold `shift` for 1%) ·
+`1`–`9`, `0` volume 10–100% · `m` mute · `tab` output/input · `a` play alerts here ·
+`s` next sample rate · `r` refresh. Devices without software volume (most HDMI and
+DisplayPort outputs) show "fixed volume".
+
+### The Macutil.app window
+
+`Macutil.app` opens the menu in a small panel in Ghostty, kitty, Alacritty or WezTerm,
+whichever it finds first (set `MACUTIL_TERMINAL=/Applications/Name.app` to choose). The
+panel has no titlebar or window buttons. `q` quits and closes it. In Ghostty it opens centred
+on the main screen; other terminals place it themselves. Terminal.app, the last
+fallback, opens a normal window.
+
+The window is titled `macutil`. With a tiling window manager, add a rule to float it. For
+AeroSpace, put this above any rule that matches your terminal, because AeroSpace stops at
+the first match:
+
+```toml
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+if.window-title-regex-substring = '^macutil$'
+run = 'layout floating'
+```
 
 ## Permissions
 

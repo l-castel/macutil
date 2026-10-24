@@ -652,6 +652,18 @@ dependencies = [
  "anyhow",
  "crossterm",
  "macutil-tui-kit",
+ "objc2",
+ "objc2-app-kit",
+ "ratatui",
+]
+
+[[package]]
+name = "macutil-audio"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "crossterm",
+ "macutil-tui-kit",
  "ratatui",
 ]
 

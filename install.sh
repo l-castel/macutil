@@ -9,7 +9,7 @@ cd "$(dirname "$0")"
 APPS_DIR="${APPS_DIR:-/Applications}"
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
 APP="$APPS_DIR/Macutil.app"
-BINS=(macutil macutil-wifi macutil-bt macutil-ts)
+BINS=(macutil macutil-wifi macutil-bt macutil-ts macutil-audio)
 
 if [ "${1:-}" = "--uninstall" ]; then
   for b in "${BINS[@]}"; do
