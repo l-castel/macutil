@@ -147,7 +147,7 @@ impl App for Wifi {
             .nets
             .iter()
             .map(|n| {
-                let name = if n.ssid.is_empty() { "(hidden — install the Location helper: scripts/bundle.sh)".to_string() } else { n.ssid.clone() };
+                let name = if n.ssid.is_empty() { "(hidden — install the Location helper: scripts/make-helper.sh)".to_string() } else { n.ssid.clone() };
                 let active = cur.as_deref() == Some(n.ssid.as_str()) && !n.ssid.is_empty();
                 ListItem::new(Line::from(vec![
                     Span::styled(if active { "● " } else { "  " }, theme::good()),

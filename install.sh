@@ -1,48 +1,46 @@
 #!/bin/bash
-# Installs macutil: builds Macutil.app into /Applications and links the TUIs into ~/.local/bin.
+# Installs macutil from a checkout: the commands into $PREFIX/bin and the Location helper
+# (MacutilLocation.app) into $PREFIX/libexec. PREFIX defaults to ~/.local.
 #   ./install.sh             install or update
 #   ./install.sh --uninstall remove what install created
-# Override locations with APPS_DIR and BIN_DIR (MATUGEN_CONFIG picks the matugen config).
+# MATUGEN_CONFIG picks the matugen config.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APPS_DIR="${APPS_DIR:-/Applications}"
-BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
-APP="$APPS_DIR/Macutil.app"
+PREFIX="${PREFIX:-$HOME/.local}"
+BIN_DIR="$PREFIX/bin"
+HELPER="$PREFIX/libexec/MacutilLocation.app"
 BINS=(macutil macutil-wifi macutil-bt macutil-ts macutil-audio)
 
 if [ "${1:-}" = "--uninstall" ]; then
-  for b in "${BINS[@]}"; do
-    [ -L "$BIN_DIR/$b" ] && rm "$BIN_DIR/$b"
-  done
-  rm -rf "$APP"
-  echo "removed $APP and links in $BIN_DIR"
+  for b in "${BINS[@]}"; do rm -f "$BIN_DIR/$b"; done
+  rm -rf "$HELPER"
+  echo "removed ${BINS[*]} from $BIN_DIR and $HELPER"
   exit 0
 fi
 
 [ "$(uname)" = "Darwin" ] || { echo "macutil only supports macOS" >&2; exit 1; }
 command -v cargo >/dev/null || { echo "cargo not found; install Rust from https://rustup.rs" >&2; exit 1; }
 
-scripts/bundle.sh
-
-mkdir -p "$APPS_DIR" "$BIN_DIR"
-rm -rf "$APP"
-cp -R dist/Macutil.app "$APP"
+cargo build --release
+mkdir -p "$BIN_DIR" "$PREFIX/libexec"
 for b in "${BINS[@]}"; do
-  ln -sf "$APP/Contents/MacOS/$b" "$BIN_DIR/$b"
+  # rm first: older installs left symlinks here, and cp would write through them.
+  rm -f "$BIN_DIR/$b"
+  cp "target/release/$b" "$BIN_DIR/$b"
 done
+scripts/make-helper.sh target/release/macutil-wifi "$PREFIX/libexec"
 
 # matugen (optional): asks before touching the matugen config; remembers the answer.
-MACUTIL_BIN="$APP/Contents/MacOS/macutil"
-if [ -t 0 ]; then "$MACUTIL_BIN" setup-matugen; fi
+if [ -t 0 ]; then "$BIN_DIR/macutil" setup-matugen; fi
 
 echo
-echo "installed $APP"
-echo "linked ${BINS[*]} into $BIN_DIR"
+echo "installed ${BINS[*]} into $BIN_DIR"
 case ":$PATH:" in
   *":$BIN_DIR:"*) ;;
   *) echo "note: $BIN_DIR is not on your PATH" ;;
 esac
+[ -d /Applications/Macutil.app ] && echo "note: /Applications/Macutil.app is from an older install and can be deleted"
 cat <<MSG
 
 next steps:

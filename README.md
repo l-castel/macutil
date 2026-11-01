@@ -16,44 +16,27 @@ Requires macOS 14 (Sonoma) or newer. Apple silicon is the tested platform.
 
 ## Install
 
-Every option below installs the same tools. They differ in one thing: whether they include
-the **Location helper**, a small app that lets `macutil-wifi` show network names (macOS hides
-them otherwise; see [Permissions](#permissions)).
+macutil is a set of terminal programs; run them in any terminal. Besides the five
+commands, an install includes the **Location helper** (`MacutilLocation.app`), a small
+background app that lets `macutil-wifi` show network names (macOS hides them otherwise;
+see [Permissions](#permissions)).
 
-| Method | Location helper | WiFi network names |
-|---|---|---|
-| Homebrew cask | included | shown |
-| Install script | included | shown |
-| Build the app bundle (`scripts/bundle.sh`) | included | shown |
-| Homebrew formula | **not included** | **blank** |
-| Plain `cargo build` | **not included** | **blank** |
+### Homebrew (recommended)
 
-If you use WiFi, pick one of the first three.
-
-### Homebrew cask (recommended)
-
-Installs `Macutil.app` and puts the five commands on your `PATH`. The cask comes from a
-personal tap, so it needs no Apple notarization.
-
-```sh
-brew install --cask l-castel/tap/macutil
-```
-
-### Homebrew formula (no Location helper)
-
-Builds only the command-line tools from source with Homebrew's Rust toolchain. WiFi
-network names will be blank. Use the cask if you need them.
+Builds from source with Homebrew's Rust toolchain and installs the commands and the
+Location helper.
 
 ```sh
 brew install l-castel/tap/macutil
 ```
 
-The formula and the cask install the same commands, so install one or the other, not both.
+Before 0.4.0 macutil was a cask that installed `Macutil.app`. To switch:
+`brew uninstall --cask macutil && brew install l-castel/tap/macutil`.
 
 ### Install script
 
-Builds from a checkout, installs `Macutil.app` (with the Location helper) into
-`/Applications` and links the commands into `~/.local/bin`.
+Builds from a checkout and installs the commands into `~/.local/bin` and the Location
+helper into `~/.local/libexec`.
 
 ```sh
 git clone https://github.com/l-castel/macutil.git
@@ -61,8 +44,8 @@ cd macutil
 ./install.sh
 ```
 
-Remove it again with `./install.sh --uninstall`. Override locations with `APPS_DIR`
-and `BIN_DIR`.
+Remove it again with `./install.sh --uninstall`. Set `PREFIX` to install somewhere other
+than `~/.local`.
 
 ### Build from source
 
@@ -77,8 +60,8 @@ cargo build --release
 The binaries land in `target/release/` (`macutil`, `macutil-wifi`, `macutil-bt`,
 `macutil-ts`, `macutil-audio`). Keep them in the same directory: the menu launches its siblings.
 This gives you the tools **without** the Location helper, so WiFi network names are
-blank. To get the helper, run `scripts/bundle.sh` instead. It builds `dist/Macutil.app`,
-which you can copy to `/Applications`.
+blank. To add it, build it next to the binaries:
+`scripts/make-helper.sh target/release/macutil-wifi target/release`.
 
 ## Usage
 
@@ -104,32 +87,14 @@ Homebrew.
 `s` next sample rate · `r` refresh. Devices without software volume (most HDMI and
 DisplayPort outputs) show "fixed volume".
 
-### The Macutil.app window
-
-`Macutil.app` opens the menu in a small panel in Ghostty, kitty, Alacritty or WezTerm,
-whichever it finds first (set `MACUTIL_TERMINAL=/Applications/Name.app` to choose). The
-panel has no titlebar or window buttons. `q` quits and closes it. Terminal.app, the last
-fallback, opens a normal window.
-
-The window is titled `macutil`. Tiling window managers may float it because it has no
-window buttons. To tile it in AeroSpace, add this rule above any rule that matches your
-terminal, because AeroSpace stops at the first match:
-
-```toml
-[[on-window-detected]]
-if.app-id = 'com.mitchellh.ghostty'
-if.window-title-regex-substring = '^macutil$'
-run = 'layout tiling'
-```
-
 ## Permissions
 
 - **Bluetooth**: macOS may ask your terminal for Bluetooth access the first time.
 - **Location**: macOS hides WiFi network names from any process without Location access,
-  and command-line tools cannot be granted it. The app bundle includes a small helper
-  (`MacutilLocation.app`) that holds this permission. Run `macutil-wifi`, press `s`, and
-  answer the prompt once. Without the helper (formula or plain `cargo build`), scans still
-  work but network names are blank.
+  and command-line tools cannot be granted it. A small helper app (`MacutilLocation.app`)
+  holds this permission. Run `macutil-wifi`, press `s`, and answer the prompt. Every build
+  of the helper is a new app to macOS, so it asks again after an upgrade. Without the
+  helper (plain `cargo build`), scans still work but network names are blank.
 
 ## Theming
 
@@ -185,8 +150,7 @@ default, `~/Library/Application Support/com.InioX.matugen/config.toml`, or
 
 ## Uninstall
 
-- Cask: `brew uninstall --cask macutil` (add `--zap` to remove config)
-- Formula: `brew uninstall macutil`
+- Homebrew: `brew uninstall macutil`
 - Install script: `./install.sh --uninstall`
 
 ## License

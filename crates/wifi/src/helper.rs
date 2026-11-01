@@ -1,6 +1,6 @@
 //! macOS hides SSIDs from processes without Location access, and a CLI run from a terminal
 //! can't be granted it. The same binary, packaged as `MacutilLocation.app` (see
-//! `scripts/bundle.sh`), runs in helper mode: it asks for Location, scans, writes JSON.
+//! `scripts/make-helper.sh`), runs in helper mode: it asks for Location, scans, writes JSON.
 
 use std::path::PathBuf;
 use std::process::Command;
@@ -51,17 +51,15 @@ pub fn run(out: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
+/// `<prefix>/libexec` next to `<prefix>/bin` (Homebrew, install.sh), or beside the binary
+/// (`cargo build` plus make-helper.sh). Homebrew's `bin/` holds symlinks into the keg, so
+/// resolve them first.
 fn helper_app() -> Option<PathBuf> {
-    let exe = std::env::current_exe().ok()?;
-    let home = std::env::var_os("HOME").map(PathBuf::from);
-    [
-        exe.parent()?.join("../Helpers/MacutilLocation.app"),
-        exe.parent()?.join("MacutilLocation.app"),
-        home.as_ref()?.join("Applications/Macutil.app/Contents/Helpers/MacutilLocation.app"),
-        PathBuf::from("/Applications/Macutil.app/Contents/Helpers/MacutilLocation.app"),
-    ]
-    .into_iter()
-    .find(|p| p.exists())
+    let exe = std::fs::canonicalize(std::env::current_exe().ok()?).ok()?;
+    let dir = exe.parent()?;
+    [dir.join("../libexec/MacutilLocation.app"), dir.join("MacutilLocation.app")]
+        .into_iter()
+        .find(|p| p.exists())
 }
 
 /// Runs the helper app and returns its snapshot, or `None` if it isn't installed or failed.
